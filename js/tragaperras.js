@@ -44,7 +44,11 @@ function tiradaPrincipal() {
 
 //funcion que se llamara al pulsar cualquiera de los botones de "volver a tirar"
 function avance() {
-    alert("avance");
+   // alert("avance");
+
+    ventanas[i] = imagenes[Math.floor(Math.random() * imagenes.length)];
+    //añado las imagenes al div "ventana"
+    document.querySelectorAll(".ventana")[i].innerHTML = `<img src="img/${ventanas[i]}">`;
 }
 
 //funcion para añadir al inicio un numero de monedas aleatorio
@@ -78,7 +82,12 @@ function comprobarPremio() {
     if (ventanas[0] == ventanas[1] && ventanas[1] == ventanas[2]) {
         //añadira una moneda como premio
         monedas.push("moneda.png");
-        alert("Premio, has ganado una moneda.");
+        document.querySelector("#velo").style.display="flex";
+        document.querySelector("#velo").innerHTML=`<div id="cuadro_mensaje">
+        <img id="cruz" src="img/cruz.svg" width="28px">
+        <div id="mensaje">"Has ganado 1 moneda</div>
+      </div>`;
+
     }
 }
 
@@ -95,7 +104,11 @@ function actualizarMonedas() {
     }
     //cuando no quedan monedas avisa mediante mensaje
     if (monedas.length == 0) {
-        alert("No tienes credito");
+        document.querySelector("#velo").style.display="flex";
+        document.querySelector("#velo").innerHTML=`<div id="cuadro_mensaje">
+        <img id="cruz" src="img/cruz.svg" width="28px">
+        <div id="mensaje">Te has quedado sin credito</div>
+      </div>`;
     }
 
 }
