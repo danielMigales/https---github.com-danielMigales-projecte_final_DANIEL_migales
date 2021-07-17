@@ -2,7 +2,7 @@ window.onload = inici;
 
 function inici() {
     //boton tirar
-    document.querySelector("#lanzar").onclick = tiradaInicial;
+    document.querySelector("#lanzar").onclick = tiradaPrincipal;
     //boton 1 tirada
     document.querySelector("#b0").onclick = avance;
     //boton 2 tirada
@@ -17,9 +17,11 @@ function inici() {
 var monedas = [];
 //array para guardar los nombres de las imagenes
 var imagenes = ["cerezas.png", "fresa.png", "limon.png", "naranja.png", "platanos.png", "sandia.png"];
+//array que guarda las imagenes de las ventanas para luego compararlas
+var ventanas = [];
 
 //funcion que generara la tirada general
-function tiradaInicial() {
+function tiradaPrincipal() {
     //este caso siempre se aplicara, ya que he corregido que nunca tenga el valor de 0 en la funcion creditoInicial
     if (monedas.length > 0) {
         //recorro el array de imagenes para obtener una aleatoriamente y añado la imagen en el div "ventana"
@@ -27,17 +29,17 @@ function tiradaInicial() {
         let totalDivs = document.querySelectorAll(".ventana").length;
         for (let i = 0; i < totalDivs; i++) {
             //posicion del array random
-            let nuevaImagen = imagenes[Math.floor(Math.random() * imagenes.length)];
+            ventanas[i] = imagenes[Math.floor(Math.random() * imagenes.length)];
             //añado las imagenes al div "ventana"
-            document.querySelectorAll(".ventana")[i].innerHTML = `<img src="img/${nuevaImagen}">`;
-            console.log(nuevaImagen);
+            document.querySelectorAll(".ventana")[i].innerHTML = `<img src="img/${ventanas[i]}">`;
         }
     }
-
-    //llamada a la funcion que resta una moneda y actualiza las imagenes de monedas
-    actualizarMonedas();
+    //resto al array monedas una moneda
+    monedas.pop();
     //llamada a la funcion que comprueba si hay coincidencias en las imagenes para otorgar premio
     comprobarPremio();
+    //llamada a la funcion que resta una moneda y actualiza las imagenes de monedas
+    actualizarMonedas();
 }
 
 //funcion que se llamara al pulsar cualquiera de los botones de "volver a tirar"
@@ -56,7 +58,6 @@ function creditoInicial() {
         for (let i = 0; i < length; i++) {
             monedas.push("moneda.png");
         }
-        console.log(monedas);
     }
     //en caso de salir el cero, el valor siempre sera un 1 y llenara el array de monedas con una imagen
     else {
@@ -73,13 +74,25 @@ function creditoInicial() {
 
 //funcion que comprueba si hay coincidencia en las tres imagenes
 function comprobarPremio() {
-
+    //si son las tres imagenes del array ventanas iguales lanzara la alerta
+    if (ventanas[0] == ventanas[1] && ventanas[1] == ventanas[2]) {
+        //añadira una moneda como premio
+        monedas.push("moneda.png");
+        alert("Premio, has ganado una moneda.");
+    }
 }
 
 //funcion para actualizar las monedas cada vez que se tira
 function actualizarMonedas() {
-    //resto al array monedas una moneda
-    monedas.pop();
+    //Vuelvo a cargar el div con la cantidad de dinero en numero que hay ahora
+    document.querySelector("#dinero").innerHTML = monedas.length + `<span class="euros">€</span>`;
+    //Para mostrar la cantidad de monedas que hay ahora vuelvo a cargar el div con las imagenes
+    //Primero elimino las que estan ahora
+    document.querySelector("#monedas").innerHTML ="";
+    for (let coin of monedas) {
+        //Inserto de nuevo las monedas
+        document.querySelector("#monedas").innerHTML += `<img src="img/${coin}">`;
+    }
     //cuando no quedan monedas avisa mediante mensaje
     if (monedas.length == 0) {
         alert("No tienes credito");
