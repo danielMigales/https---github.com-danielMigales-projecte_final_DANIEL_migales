@@ -1,5 +1,14 @@
 window.onload = inici;
 
+//array donde guardar las monedas disponibles
+var monedas = [];
+//array para guardar los nombres de las imagenes
+var imagenes = ["cerezas.png", "fresa.png", "limon.png", "naranja.png", "platanos.png", "sandia.png"];
+//array que guarda las imagenes de las ventanas para luego compararlas
+var ventanas = [];
+//variable para el audio
+var mp3;
+
 function inici() {
     //boton tirar
     document.querySelector("#lanzar").onclick = tiradaPrincipal;
@@ -9,19 +18,15 @@ function inici() {
     document.querySelector("#b1").onclick = avance;
     //boton 3 tirada
     document.querySelector("#b2").onclick = avance;
+    //inicializacion de variable audio
+    mp3 = document.getElementById("audio");
     //generar credito inicial
     creditoInicial();
 }
 
-//array donde guardar las monedas disponibles
-var monedas = [];
-//array para guardar los nombres de las imagenes
-var imagenes = ["cerezas.png", "fresa.png", "limon.png", "naranja.png", "platanos.png", "sandia.png"];
-//array que guarda las imagenes de las ventanas para luego compararlas
-var ventanas = [];
-
 //funcion que generara la tirada general
 function tiradaPrincipal() {
+
     //este caso siempre se aplicara, ya que he corregido que nunca tenga el valor de 0 en la funcion creditoInicial
     if (monedas.length > 0) {
         //recorro el array de imagenes para obtener una aleatoriamente y añado la imagen en el div "ventana"
@@ -33,6 +38,9 @@ function tiradaPrincipal() {
             //añado las imagenes al div "ventana"
             document.querySelectorAll(".ventana")[i].innerHTML = `<img src="img/${ventanas[i]}">`;
         }
+        //añado el sonido de lanzar y se reproduce el audio
+        mp3.src = "../audios/lanzar.mp3";
+        mp3.play();
     }
     //resto al array monedas una moneda
     monedas.pop();
@@ -44,7 +52,10 @@ function tiradaPrincipal() {
 
 //funcion que se llamara al pulsar cualquiera de los botones de "volver a tirar"
 function avance() {
-   // alert("avance");
+
+    //cambio el archivo de audio y se reproduce
+    mp3.src = "../audios/otra.wav";
+    mp3.play();
 
     ventanas[i] = imagenes[Math.floor(Math.random() * imagenes.length)];
     //añado las imagenes al div "ventana"
@@ -53,10 +64,12 @@ function avance() {
 
 //funcion para añadir al inicio un numero de monedas aleatorio
 function creditoInicial() {
+
     //se aplica la formula random para obtener un maximo total de 15 monedas
     let monedasRandom = Math.floor(Math.random() * 15);
     //el numero obtenido por el random sera el total de monedas y el total del tamaño del array que guardara imagenes de monedas
     var length = monedasRandom;
+
     //si el numero obtenido aleatorio es mayor que el 0 llenara el array siendo ese mismo su longitud
     if (monedasRandom > 0) {
         for (let i = 0; i < length; i++) {
@@ -78,37 +91,67 @@ function creditoInicial() {
 
 //funcion que comprueba si hay coincidencia en las tres imagenes
 function comprobarPremio() {
+
     //si son las tres imagenes del array ventanas iguales lanzara la alerta
     if (ventanas[0] == ventanas[1] && ventanas[1] == ventanas[2]) {
-        //añadira una moneda como premio
-        monedas.push("moneda.png");
-        document.querySelector("#velo").style.display="flex";
-        document.querySelector("#velo").innerHTML=`<div id="cuadro_mensaje">
-        <img id="cruz" src="img/cruz.svg" width="28px">
-        <div id="mensaje">"Has ganado 1 moneda</div>
-      </div>`;
 
+
+        //dependiendo de la fruta que salga el premio sera mayor o menor
+        var premio;
+        if (ventanas[1] == "cerezas.png") {
+            premio = 1;
+            monedas.push("moneda.png");
+        } else if (ventanas[1] == "fresa.png") {
+            premio = 2;
+            monedas.push("moneda.png", "moneda.png");
+        } else if (ventanas[1] == "limon.png") {
+            premio = 3;
+            monedas.push("moneda.png", "moneda.png", "moneda.png");
+        } else if (ventanas[1] == "naranja.png") {
+            premio = 4;
+            monedas.push("moneda.png", "moneda.png", "moneda.png", "moneda.png");
+        } else if (ventanas[1] == "platanos.png") {
+            premio = 5;
+            monedas.push("moneda.png", "moneda.png", "moneda.png", "moneda.png", "moneda.png");
+        } else if (ventanas[1] == "sandia.png") {
+            premio = 6;
+            monedas.push("moneda.png", "moneda.png", "moneda.png", "moneda.png", "moneda.png", "moneda.png");
+        }
+        //aparece el velo
+        document.querySelector("#velo").style.display = "flex";
+        document.querySelector("#velo").innerHTML = `<div id="cuadro_mensaje">
+        <img id="cruz" src="img/cruz.svg" width="28px">
+        <div id="mensaje">"Has ganado ${premio} monedas"</div>
+        <img src="img/moneda.png" width="28px">
+      </div>`;
+        //Se reproduce el sonido de premio
+        mp3.src = "../audios/ganar.mp3";
+        mp3.play();
     }
 }
 
 //funcion para actualizar las monedas cada vez que se tira
 function actualizarMonedas() {
+
     //Vuelvo a cargar el div con la cantidad de dinero en numero que hay ahora
     document.querySelector("#dinero").innerHTML = monedas.length + `<span class="euros">€</span>`;
     //Para mostrar la cantidad de monedas que hay ahora vuelvo a cargar el div con las imagenes
     //Primero elimino las que estan ahora
-    document.querySelector("#monedas").innerHTML ="";
+    document.querySelector("#monedas").innerHTML = "";
     for (let coin of monedas) {
         //Inserto de nuevo las monedas
         document.querySelector("#monedas").innerHTML += `<img src="img/${coin}">`;
     }
     //cuando no quedan monedas avisa mediante mensaje
     if (monedas.length == 0) {
-        document.querySelector("#velo").style.display="flex";
-        document.querySelector("#velo").innerHTML=`<div id="cuadro_mensaje">
+        document.querySelector("#velo").style.display = "flex";
+        document.querySelector("#velo").innerHTML = `<div id="cuadro_mensaje">
         <img id="cruz" src="img/cruz.svg" width="28px">
         <div id="mensaje">Te has quedado sin credito</div>
       </div>`;
+        //Se reproduce el sonido de perdida
+        mp3.src = "../audios/final.mp3";
+        mp3.play();
     }
 
 }
