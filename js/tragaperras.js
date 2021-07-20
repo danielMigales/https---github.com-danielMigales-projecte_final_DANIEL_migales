@@ -22,8 +22,6 @@ function inici() {
     mp3 = document.getElementById("audio");
     //generar credito inicial
     creditoInicial();
-    //boton de los velos
-    document.getElementById("cruz").onclick = cerrarVelo;
 }
 
 //funcion que generara la tirada general
@@ -42,10 +40,11 @@ function tiradaPrincipal() {
         //añado el sonido de lanzar
         sonidos("lanzar.mp3");
     }
-    else{
-        veloSinCredito();
+    else {
+        //en caso de que en la inicial solo tuviese una moneda y se acabase el credito
+        velo("Te has quedado sin credito", "final.mp3");
     }
-    //resto al array monedas una moneda
+    //resto al array monedas una moneda por la tirada hecha
     monedas.pop();
     //llamada a la funcion que comprueba si hay coincidencias en las imagenes para otorgar premio
     comprobarPremio();
@@ -57,11 +56,11 @@ function tiradaPrincipal() {
 
 //funcion que se llamara al pulsar cualquiera de los botones de "volver a tirar"
 function avance() {
-    //si la variable boolena es cierta dejara realizar las tiradas y hay credito
-    if (avanceDisponible && monedas.length>0) {
+    //si la variable boolena es cierta y hay credito dejara realizar las tiradas 
+    if (avanceDisponible && monedas.length > 0) {
         //genero una nueva imagen random
         let imagenNueva = imagenes[Math.floor(Math.random() * imagenes.length)];
-        //obtengo el id del boton y le asigno un numero
+        //obtengo el id del boton clicado y le asigno un numero para saber que ventana debe cambiar de imagen
         let id = this.id;
         if (id == "b0") {
             id = 0;
@@ -72,17 +71,18 @@ function avance() {
         }
         //si la imagen que hay en la ventana es igual que la nueva, genero otra random hasta que sea diferente
         while (ventanas[id] == imagenNueva) {
-            console.log(ventanas[id]);
             imagenNueva = imagenes[Math.floor(Math.random() * imagenes.length)];
         }
         //una vez asegurado que la imagen no va a ser igual continuo la sequencia
         //reproducir audio de boton volver a tirar
         sonidos("otra.wav");
         //resto al array monedas una moneda y llamo a la funcion de actualizar el div de imagenes de monedas
-        monedas.pop();        
+        monedas.pop();
         //añado las imagenes nuevas al div "ventana" correspondiente segun el boton que se ha pulsado
         document.querySelectorAll(".ventana")[id].innerHTML = `<img src="img/${imagenNueva}">`;
+        //en el array sustituyo la imagen que habia por la nueva, asi se en todo momento que imagenes hay en las casillas
         ventanas[id] = imagenNueva;
+        //comprueba si hay premio despues de cada tirada y actualiza el monedero
         comprobarPremio();
         actualizarMonedas();
     }
@@ -100,7 +100,7 @@ function creditoInicial() {
             monedas.push("moneda.png");
         }
     }
-    //en caso de salir el cero, el valor siempre sera un 1 y llenara el array de monedas con una imagen
+    //en caso de salir el cero en el random, el valor siempre sera un 1 y llenara el array de monedas con una imagen
     else {
         monedasRandom = 1;
         monedas.push("moneda.png");
@@ -117,7 +117,8 @@ function creditoInicial() {
 function comprobarPremio() {
     //si son las tres imagenes del array ventanas iguales lanzara la alerta
     if (ventanas[0] == ventanas[1] && ventanas[1] == ventanas[2]) {
-        //dependiendo de la fruta que salga el premio sera mayor o menor
+        //Como las tres imagenes son iguales compruebo una de ellas y dependiendo de la fruta que salga el premio sera mayor o menor
+        //lo que hago es leer el array y comparar los nombres, dando x monedas y añadiendo al array monedero una imagen
         var premio;
         if (ventanas[1] == "cerezas.png") {
             premio = 1;
@@ -138,8 +139,10 @@ function comprobarPremio() {
             premio = 6;
             monedas.push("moneda.png", "moneda.png", "moneda.png", "moneda.png", "moneda.png", "moneda.png");
         }
-        //aparece el velo
-        veloGanador(premio);
+        //una vez comprobado el premio aparece el velo de ganador al que le paso los parametros
+        velo("Has ganado", "ganar.mp3", premio);
+        //se bloquean los tres botones de avance hasta que se tira de nuevo
+        avanceDisponible = false;
     }
 }
 
@@ -156,45 +159,53 @@ function actualizarMonedas() {
     }
     //cuando no quedan monedas avisa mediante mensaje
     if (monedas.length == 0) {
-        veloSinCredito();
+        velo("Te has quedado sin credito", "final.mp3", 0);
         //se bloquean los tres botones de avance
-        avanceDisponible=false;
+        avanceDisponible = false;
     }
 }
 
 //funciones para llenar los velos
-function veloSinCredito() {
+function velo(mensaje, archivoMp3, premio) {
+    //muestro el div de velo
     document.querySelector("#velo").style.display = "flex";
+    //inserto el div con los mensajes
     document.querySelector("#velo").innerHTML = `<div id="cuadro_mensaje">
-    <img id="cruz" src="img/cruz.svg" width="28px" onclick=cerrarVelo()>
-    <div id="mensaje">Te has quedado sin credito</div>
-  </div>`;
-    //Se reproduce el sonido de perdida
-    sonidos("final.mp3");
-}
-
-function veloGanador(premio) {
-    document.querySelector("#velo").style.display = "flex";
-    document.querySelector("#velo").innerHTML = `<div id="cuadro_mensaje">
-    <img id="cruz" src="img/cruz.svg" width="28px" onclick=cerrarVelo()>
-    <div id="mensaje">"Has ganado ${premio} monedas"</div>
+    <img id="cruz" src="img/cruz.svg" width="28px">
+    <div id="mensaje">${mensaje} ${premio}€</div>
     <div id="premio" style="text-align: center"></div>
   </div>`;
+    //segun el premio se añaden monedas en el div premio
     for (let i = 0; i < premio; i++) {
         document.querySelector("#premio").innerHTML += `<img src="img/moneda.png" width="28px">`;
     }
-    //Se reproduce el sonido de premio
-    sonidos("ganar.mp3");
+    //preparo el boton de los velos para cerrarlos
+    document.getElementById("cruz").onclick = cerrarVelo;
+    //Se reproduce el sonido correspondiente
+    sonidos(archivoMp3);
 }
 
 //funcion de reproduccir audio
 function sonidos(nombreAudio) {
+    //con el parametro le paso el nombre del audio y con el creo la ruta para hacer los cambios
     let ruta = "../audios/" + nombreAudio;
     mp3.src = ruta;
-    mp3.play();
+    //El audio me estaba dando problemas: 
+    //Uncaught (in promise) DOMException: The play() request was interrupted by a new load request.
+    //con lo cual he tenido que añadir esta solucion de google: 
+    //https://developers.google.com/web/updates/2017/06/play-request-was-interrupted
+    var playPromise = mp3.play();
+    if (playPromise !== undefined) {
+        playPromise.then(_ => {
+            mp3.play();
+        })
+            .catch(error => {
+               
+            });
+    }
 }
 
 //funcion del boton del velo
-function cerrarVelo(){
+function cerrarVelo() {
     document.querySelector("#velo").style.display = "none";
 }
