@@ -24,6 +24,31 @@ function inici() {
     creditoInicial();
 }
 
+//funcion para añadir al inicio un numero de monedas aleatorio
+function creditoInicial() {
+    //se aplica la formula random para obtener un maximo total de 15 monedas
+    let monedasRandom = Math.floor(Math.random() * 15);
+    //el numero obtenido por el random sera el total de monedas y el total del tamaño del array que guardara imagenes de monedas
+    var length = monedasRandom;
+    //si el numero obtenido aleatorio es mayor que el 0 llenara el array siendo ese mismo su longitud
+    if (monedasRandom > 0) {
+        for (let i = 0; i < length; i++) {
+            monedas.push("moneda.png");
+        }
+    }
+    //en caso de salir el cero en el random, el valor siempre sera un 1 y llenara el array de monedas con una imagen
+    else {
+        monedasRandom = 1;
+        monedas.push("moneda.png");
+    }
+    //se llenara el div "dinero" con el numero total de monedas y el simbolo del euro (esto ultimo tengo que mejorar el sistema...)
+    document.querySelector("#dinero").innerHTML = monedasRandom + `<span class="euros">€</span>`;
+    //se llenara el div "monedas" con el contenido del array monedas (que son imagenes de monedas)
+    for (let coin of monedas) {
+        document.querySelector("#monedas").innerHTML += `<img src="img/${coin}">`;
+    }
+}
+
 //funcion que generara la tirada general
 function tiradaPrincipal() {
     //este caso siempre se aplicara, ya que he corregido que nunca tenga el valor de 0 en la funcion creditoInicial
@@ -52,65 +77,6 @@ function tiradaPrincipal() {
     actualizarMonedas();
     //la variable se pone en true para que permita realizar tiradas extras
     avanceDisponible = true;
-}
-
-//funcion que se llamara al pulsar cualquiera de los botones de "volver a tirar"
-function avance() {
-    //si la variable boolena es cierta y hay credito dejara realizar las tiradas 
-    if (avanceDisponible && monedas.length > 0) {
-        //genero una nueva imagen random
-        let imagenNueva = imagenes[Math.floor(Math.random() * imagenes.length)];
-        //obtengo el id del boton clicado y le asigno un numero para saber que ventana debe cambiar de imagen
-        let id = this.id;
-        if (id == "b0") {
-            id = 0;
-        } else if (id == "b1") {
-            id = 1;
-        } else if (id == "b2") {
-            id = 2;
-        }
-        //si la imagen que hay en la ventana es igual que la nueva, genero otra random hasta que sea diferente
-        while (ventanas[id] == imagenNueva) {
-            imagenNueva = imagenes[Math.floor(Math.random() * imagenes.length)];
-        }
-        //una vez asegurado que la imagen no va a ser igual continuo la sequencia
-        //reproducir audio de boton volver a tirar
-        sonidos("otra.wav");
-        //resto al array monedas una moneda y llamo a la funcion de actualizar el div de imagenes de monedas
-        monedas.pop();
-        //añado las imagenes nuevas al div "ventana" correspondiente segun el boton que se ha pulsado
-        document.querySelectorAll(".ventana")[id].innerHTML = `<img src="img/${imagenNueva}">`;
-        //en el array sustituyo la imagen que habia por la nueva, asi se en todo momento que imagenes hay en las casillas
-        ventanas[id] = imagenNueva;
-        //comprueba si hay premio despues de cada tirada y actualiza el monedero
-        comprobarPremio();
-        actualizarMonedas();
-    }
-}
-
-//funcion para añadir al inicio un numero de monedas aleatorio
-function creditoInicial() {
-    //se aplica la formula random para obtener un maximo total de 15 monedas
-    let monedasRandom = Math.floor(Math.random() * 15);
-    //el numero obtenido por el random sera el total de monedas y el total del tamaño del array que guardara imagenes de monedas
-    var length = monedasRandom;
-    //si el numero obtenido aleatorio es mayor que el 0 llenara el array siendo ese mismo su longitud
-    if (monedasRandom > 0) {
-        for (let i = 0; i < length; i++) {
-            monedas.push("moneda.png");
-        }
-    }
-    //en caso de salir el cero en el random, el valor siempre sera un 1 y llenara el array de monedas con una imagen
-    else {
-        monedasRandom = 1;
-        monedas.push("moneda.png");
-    }
-    //se llenara el div "dinero" con el numero total de monedas y el simbolo del euro (esto ultimo tengo que mejorar el sistema...)
-    document.querySelector("#dinero").innerHTML = monedasRandom + `<span class="euros">€</span>`;
-    //se llenara el div "monedas" con el contenido del array monedas (que son imagenes de monedas)
-    for (let coin of monedas) {
-        document.querySelector("#monedas").innerHTML += `<img src="img/${coin}">`;
-    }
 }
 
 //funcion que comprueba si hay coincidencia en las tres imagenes
@@ -165,6 +131,40 @@ function actualizarMonedas() {
     }
 }
 
+//funcion que se llamara al pulsar cualquiera de los botones de "volver a tirar"
+function avance() {
+    //si la variable boolena es cierta y hay credito dejara realizar las tiradas 
+    if (avanceDisponible && monedas.length > 0) {
+        //genero una nueva imagen random
+        let imagenNueva = imagenes[Math.floor(Math.random() * imagenes.length)];
+        //obtengo el id del boton clicado y le asigno un numero para saber que ventana debe cambiar de imagen
+        let posicion;
+        if (this.id == "b0") {
+            posicion = 0;
+        } else if (this.id == "b1") {
+            posicion = 1;
+        } else if (this.id == "b2") {
+            posicion = 2;
+        }
+        //si la imagen que hay en la ventana es igual que la nueva, genero otra random hasta que sea diferente
+        while (ventanas[posicion] == imagenNueva) {
+            imagenNueva = imagenes[Math.floor(Math.random() * imagenes.length)];
+        }
+        //una vez asegurado que la imagen no va a ser igual continuo la sequencia
+        //reproducir audio de boton volver a tirar
+        sonidos("otra.wav");
+        //resto al array monedas una moneda y llamo a la funcion de actualizar el div de imagenes de monedas
+        monedas.pop();
+        //añado las imagenes nuevas al div "ventana" correspondiente segun el boton que se ha pulsado
+        document.querySelectorAll(".ventana")[posicion].innerHTML = `<img src="img/${imagenNueva}">`;
+        //en el array sustituyo la imagen que habia por la nueva, asi se en todo momento que imagenes hay en las casillas
+        ventanas[posicion] = imagenNueva;
+        //comprueba si hay premio despues de cada tirada y actualiza el monedero
+        comprobarPremio();
+        actualizarMonedas();
+    }
+}
+
 //funciones para llenar los velos
 function velo(mensaje, archivoMp3, premio) {
     //muestro el div de velo
@@ -200,7 +200,7 @@ function sonidos(nombreAudio) {
             mp3.play();
         })
             .catch(error => {
-               
+
             });
     }
 }
