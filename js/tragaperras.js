@@ -124,7 +124,8 @@ function velo(mensaje, archivoMp3, premio) {
 }
 
 function sonidos(nombreAudio) {
-    let ruta = "../audios/" + nombreAudio;
+    let ruta = "audios/" + nombreAudio;
+    console.log(ruta);
     mp3.src = ruta;
     var playPromise = mp3.play();
     if (playPromise !== undefined) {
