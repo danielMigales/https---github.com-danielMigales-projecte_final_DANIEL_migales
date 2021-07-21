@@ -51,13 +51,12 @@ function creditoInicial() {
 
 //funcion que generara la tirada general
 function tiradaPrincipal() {
-    //este caso siempre se aplicara, ya que he corregido que nunca tenga el valor de 0 en la funcion creditoInicial
-    if (monedas.length > 0) {
-        //recorro el array de imagenes para obtener una aleatoriamente y añado la imagen en el div "ventana"
-        //para que solo haga tres vueltas le coloco como longitud los div con class "ventana"
+    //si hay monedas permite tirar. Esto se comprueba con la longitud del array monedas
+    if (monedas.length > 0) { 
+        //variable para saber cuantas ventanas hay en el juego (son 3)       
         let totalDivs = document.querySelectorAll(".ventana").length;
         for (let i = 0; i < totalDivs; i++) {
-            //posicion del array random
+            //en cada posicion del array coloco una imagen random
             ventanas[i] = imagenes[Math.floor(Math.random() * imagenes.length)];
             //añado las imagenes al div "ventana"
             document.querySelectorAll(".ventana")[i].innerHTML = `<img src="img/${ventanas[i]}">`;
@@ -88,22 +87,20 @@ function comprobarPremio() {
         var premio;
         if (ventanas[1] == "cerezas.png") {
             premio = 1;
-            monedas.push("moneda.png");
         } else if (ventanas[1] == "fresa.png") {
             premio = 2;
-            monedas.push("moneda.png", "moneda.png");
         } else if (ventanas[1] == "limon.png") {
             premio = 3;
-            monedas.push("moneda.png", "moneda.png", "moneda.png");
         } else if (ventanas[1] == "naranja.png") {
             premio = 4;
-            monedas.push("moneda.png", "moneda.png", "moneda.png", "moneda.png");
         } else if (ventanas[1] == "platanos.png") {
             premio = 5;
-            monedas.push("moneda.png", "moneda.png", "moneda.png", "moneda.png", "moneda.png");
         } else if (ventanas[1] == "sandia.png") {
             premio = 6;
-            monedas.push("moneda.png", "moneda.png", "moneda.png", "moneda.png", "moneda.png", "moneda.png");
+        }
+        //lleno el array con monedas segun el premio
+        for(let i=0;i<premio;i++){
+            monedas.push("moneda.png");  
         }
         //una vez comprobado el premio aparece el velo de ganador al que le paso los parametros
         velo("Has ganado", "ganar.mp3", premio);
