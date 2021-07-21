@@ -170,7 +170,7 @@ function velo(mensaje, archivoMp3, premio) {
     document.querySelector("#velo").innerHTML = `<div id="cuadro_mensaje">
     <img id="cruz" src="img/cruz.svg" width="28px">
     <div id="mensaje">${mensaje} ${premio}€</div>
-    <div id="premio" style="text-align: center"></div>
+    <div id="premio"></div>
   </div>`;
     //segun el premio se añaden monedas en el div premio
     for (let i = 0; i < premio; i++) {
